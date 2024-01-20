@@ -1,13 +1,14 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function Message() {
   const [target , setTarget] = React.useState(useParams().target);
+  const navigate = useNavigate();
 
   const handleBackButton = (e) => {
     e.preventDefault();
 
-    window.location.href = "/chat";
+    navigate("/chat");
   }
 
   return (

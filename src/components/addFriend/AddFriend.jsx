@@ -1,9 +1,12 @@
 import React from "react";
-import { json } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function AddFriend() {
 
     const [inviteCode, setInviteCode] = React.useState('');
+    const navigate = useNavigate();
+
+
     const handleInviteSubmit = (e) => {
         e.preventDefault();
 
@@ -14,7 +17,7 @@ export default function AddFriend() {
     const handleHome = (e) => {
       e.preventDefault();
 
-      window.location.href = "/chat";
+      navigate("/chat");
     }
 
   return (
