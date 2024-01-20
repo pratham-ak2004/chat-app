@@ -1,42 +1,38 @@
 import React from 'react'
-import {useState} from 'react';
+import {signInWithPopup, GoogleAuthProvider} from 'firebase/auth';
+import {auth} from '../../config/firebase';
+import {useNavigate} from 'react-router-dom';
 
 export default function Login() {
-    const [select , setSelect] = useState('login');
 
-    const handleLoginClick = (e) => {
+    const authProvider = new GoogleAuthProvider();
+
+    const navigate = useNavigate();
+
+    const handleSignIn = (e) => {
         e.preventDefault();
-        if(select === 'login'){
-            setSelect('signup');
-        }else{ 
-            setSelect('login');
-        }
+
+        signInWithPopup(auth, authProvider)
+        .then((result) => {
+            if(result.user){
+                navigate("/chat")
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        })
     }
+
 
   return (
     <>
     <div className="flex w-full h-full justify-center items-center">
         <div className='w-full h-max max-w-sm m-10 p-6 rounded-md bg-slate-300'>
-            {select === 'login' ?(
-                <>
-                    <div className='text-3xl text-center text-slate-600'>Login</div>
-                    <div className='flex flex-col gap-4 mt-5'>
-                        <input className='rounded-md h-10 p-2 bg-slate-200' type='text' placeholder='Username' />
-                        <input className='rounded-md h-10 p-2 bg-slate-200' type='password' placeholder='Password' />
-                        <div className='text-center'>dont have an account? <br /> <a onClick={handleLoginClick} className='text-sky-600'>create one</a></div>
-                        <button className='rounded-md h-10 p-2 bg-slate-200 text-slate-600'>Login</button>
-                    </div>
-                </>
-            ):(
-                <>
-                    <div className='text-3xl text-center text-slate-600'>Sign Up</div>
-                    <div className='flex flex-col gap-4 mt-5'>
-                        <input className='rounded-md h-10 p-2 bg-slate-200' type='text' placeholder='Username' />
-                        <input className='rounded-md h-10 p-2 bg-slate-200' type='password' placeholder='Password' />
-                        <div className='text-center'>have an account? <br /> <a onClick={handleLoginClick} className='text-sky-600'> login now</a></div>
-                        <button className='rounded-md h-10 p-2 bg-slate-200 text-slate-600'>Sign Up</button>
-                    </div>
-            </>)}
+            <div className='text-3xl text-center text-slate-600 mb-4'>Login</div>
+            <button className='flex items-center justify-center gap-5 w-full rounded-md h-10 p-2 bg-slate-200 text-slate-600' onClick={(e) => {handleSignIn(e)}}>
+                <img className="h-7 w-7 mr-2" src="/google-icon.png" alt="Google Icon" />
+                    Google
+            </button>
         </div>
     </div>
     <footer className='w-full h-20 flex items-center justify-center bg-slate-100'>
