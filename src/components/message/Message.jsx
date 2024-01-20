@@ -1,10 +1,12 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 
 export default function Message() {
+  const [target , setTarget] = React.useState(useParams().target);
 
   return (
     <>
-      <div className="basis-2/3  hidden selection:md:block md:flex flex-col flex-wrap justify-between content-center" >
+      <div className="w-full md:basis-2/3 flex flex-col flex-wrap justify-between content-center" >
         <div>message top</div>
         <div className="w-full h-14 py-2 px-1 flex items-center">
           <textarea type="text" className="rounded-2xl bg-slate-300 h-full w-full px-2 pt-1 overflow-hidden text-lg text-wrap resize-none focus:outline-none" placeholder="Enter you message"/>
