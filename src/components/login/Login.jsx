@@ -6,10 +6,16 @@ import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
 
-export default function Login() {
+export default function Login(props) {
 
     const authProvider = new GoogleAuthProvider();
     const navigate = useNavigate();
+
+    React.useEffect(() => {
+        if(cookies.get("user-name")){
+            navigate(props.redirect)
+        }
+    },[])
 
     const handleSignIn = (e) => {
         e.preventDefault();
@@ -20,7 +26,7 @@ export default function Login() {
                 cookies.set("user-name", result.user.displayName)
                 cookies.set("user-img", result.user.photoURL)
                 console.log(result)
-                navigate("/chat")
+                navigate(props.redirect)
             }
         })
         .catch((error) => {
