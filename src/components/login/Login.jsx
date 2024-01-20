@@ -2,11 +2,13 @@ import React from 'react'
 import {signInWithPopup, GoogleAuthProvider} from 'firebase/auth';
 import {auth} from '../../config/firebase';
 import {useNavigate} from 'react-router-dom';
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
 
 export default function Login() {
 
     const authProvider = new GoogleAuthProvider();
-
     const navigate = useNavigate();
 
     const handleSignIn = (e) => {
@@ -15,6 +17,9 @@ export default function Login() {
         signInWithPopup(auth, authProvider)
         .then((result) => {
             if(result.user){
+                cookies.set("user-name", result.user.displayName)
+                cookies.set("user-img", result.user.photoURL)
+                console.log(result)
                 navigate("/chat")
             }
         })

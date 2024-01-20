@@ -1,6 +1,9 @@
 import React from "react";
 import { useMediaQuery } from "react-responsive";
 import { useNavigate , useLocation } from "react-router-dom";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
 
 export default function FriendList() {
 
@@ -15,8 +18,10 @@ export default function FriendList() {
   }
 
   React.useEffect(()=>{
-    console.log(location.pathname.startsWith("/chat/"),(!location.pathname.endsWith("/chat/")))
-  },[])
+    if(!cookies.get("user-name")){
+      navigate("/")
+    }
+  },[cookies.get("user-name")])
 
   return (
     <>
