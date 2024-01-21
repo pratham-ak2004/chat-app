@@ -25,6 +25,7 @@ export default function Login(props) {
             if(result.user){
                 cookies.set("user-name", result.user.displayName)
                 cookies.set("user-img", result.user.photoURL)
+                cookies.set("user-id", result.user.uid)
                 console.log(result)
                 navigate(props.redirect)
             }
