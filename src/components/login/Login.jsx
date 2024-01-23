@@ -21,13 +21,34 @@ export default function Login(props) {
         e.preventDefault();
 
         signInWithPopup(auth, authProvider)
-        .then((result) => {
+        .then(async(result) => {
             if(result.user){
                 cookies.set("user-name", result.user.displayName)
                 cookies.set("user-img", result.user.photoURL)
                 cookies.set("user-id", result.user.uid)
-                console.log(result)
-                navigate(props.redirect)
+
+                await fetch(`${import.meta.env.VITE_BACKEND_HOST_API_KEY}/api/addUser`,{
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "userId": result.user.uid,
+                        "userName": result.user.displayName,
+                        "userImg": result.user.photoURL,
+                    })
+                })
+                .then((res) => {
+                    const dataPromise = res.json();
+
+                    dataPromise.then((data) => {
+                        cookies.set("user-friends", data.friendsIds)
+                    })
+                })
+                .then(() => {
+                    navigate(props.redirect);
+                })
+
             }
         })
         .catch((error) => {

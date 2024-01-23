@@ -23,6 +23,8 @@ export default function Profile() {
       auth.signOut().then(() => {
         cookies.remove("user-name");
         cookies.remove("user-img");
+        cookies.remove("user-id");
+        cookies.remove("user-friends")
         navigate("/");
       });
     }else{
