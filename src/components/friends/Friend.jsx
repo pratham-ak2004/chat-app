@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export default function Friend(props) {
 
@@ -9,7 +9,7 @@ export default function Friend(props) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-      },
+      }
       })
       .then((res)=>{
         if(res.status === 200){
