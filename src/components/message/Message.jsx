@@ -11,10 +11,14 @@ export default function Message() {
   const navigate = useNavigate();
   const [socket , setSocket] = React.useState(undefined);
   const [messages , setMessages] = React.useState([]);
+  const [newMessage, setNewMessage] = React.useState("");
 
   const stompClient = new Client({
     brokerURL: 'ws://localhost:8080/api/socket'
-  });
+});
+  // stompClient.configure({
+  //     brokerURL: 'ws://localhost:8080/api/socket'
+  // });
 
   const handleBackButton = (e) => {
     e.preventDefault();
@@ -43,15 +47,16 @@ export default function Message() {
             setUser(data.user)
             setSocket(data.socket._id)
           })
-          .then(()=>{
-            stompClient.activate();
-          })
         }
       })
     .catch((err)=>{
       console.log(err)
     });
+  }
 
+  const fetchPreviousMessages =  () => {
+    // to do
+    console.log("fetching messages")
   }
 
   const handleConnectionWebSocket = () => {
@@ -59,7 +64,10 @@ export default function Message() {
     stompClient.onConnect = (frame) => {
       console.log('Connected: ' + frame);
       stompClient.subscribe(`/chat/${socket}`, (response) => {
+        // function which runs on sending message
           console.log(response);
+          const newMessage = JSON.parse(response.body);
+          setMessages((prevMessages) => [...prevMessages, newMessage]);
       });
     };
 
@@ -75,15 +83,42 @@ export default function Message() {
     stompClient.activate();
   }
 
-  React.useEffect(() => {
-    let delay = 0;
-    const timeoutId = setTimeout(() => {
-      fetchUserDetails(target);
-      delay = 2000
-    }, delay);
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+  
+    const sendMessage = () => {
+      if (newMessage.trim() !== "") {
+        console.log("sending message")
+        stompClient.publish({
+          destination: `/chatApp/addChat/${socket}`, // Assuming this is the correct destination
+          body: JSON.stringify({
+            content: newMessage,
+            sender: cookies.get("user-id")
+          })
+        });
+      }
+    };
+  
+    if (!stompClient.connected) {
+      stompClient.onConnect = () => {
+        sendMessage();
+      };
+      stompClient.activate();
+    } else {
+      sendMessage();
+    }
+  };
 
-    return () => clearTimeout(timeoutId);
-    },[]);
+  // UseEffects for initial fetchs
+ React.useEffect(() => {
+    fetchUserDetails(target);
+ },[])
+
+ React.useEffect(() => {
+  if (socket) {
+    handleConnectionWebSocket();
+  }
+}, [socket]);
 
   
   return (
@@ -97,7 +132,7 @@ export default function Message() {
             <h2 className="text-2xl font-medium text-left tracking-wide text-nowrap my-1">{user.userName || "Loading..."}</h2>
           </div>
         </div>
-
+        {/*TO DO */}
         <div className="w-full h-full bg-lime-300">
           {messages.map((message)=>{
             return (
@@ -111,8 +146,16 @@ export default function Message() {
 
 
         <div className="w-full h-14 py-2 px-1 flex items-center">
-          <textarea type="text" className="rounded-2xl bg-slate-300 h-full w-full px-2 pt-1 overflow-hidden text-lg text-wrap resize-none focus:outline-none" placeholder="Enter you message"/>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" className="w-10 p-1 m-2 fill-slate-700">
+          <textarea type="text" onChange={(e) => setNewMessage(e.target.value)} className="rounded-2xl bg-slate-300 h-full w-full px-2 pt-1 overflow-hidden text-lg text-wrap resize-none focus:outline-none" placeholder="Enter you message"
+          onKeyDown={
+            (e) => {
+              if(e.key === 'Enter'){
+                handleSendMessage(e);
+              }
+            }
+          }
+          />
+          <svg onClick={handleSendMessage} xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" className="w-10 p-1 m-2 fill-slate-700">
             <path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/>
           </svg>
         </div>
