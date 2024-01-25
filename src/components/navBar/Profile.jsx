@@ -19,17 +19,13 @@ export default function Profile() {
   const handleSignOut = (e) => {
     e.preventDefault();
 
-    if (cookies.get("user-name")) {
       auth.signOut().then(() => {
         cookies.remove("user-name");
         cookies.remove("user-img");
         cookies.remove("user-id");
-        cookies.remove("user-friends")
+        cookies.remove("user-friends");
         navigate("/");
       });
-    }else{
-      navigate("/")
-    }
   }
 
 

@@ -15,10 +15,7 @@ export default function Message() {
 
   const stompClient = new Client({
     brokerURL: 'ws://localhost:8080/api/socket'
-});
-  // stompClient.configure({
-  //     brokerURL: 'ws://localhost:8080/api/socket'
-  // });
+  });
 
   const handleBackButton = (e) => {
     e.preventDefault();
@@ -29,7 +26,7 @@ export default function Message() {
 
   
   const fetchUserDetails = async (uid) => {
-    
+    63
     const valueToSend = [cookies.get("user-id"),target].sort();
 
     await fetch(`${import.meta.env.VITE_BACKEND_HOST_API_KEY}/api/getUserDetailsWithSocket/${uid}`,{
@@ -85,17 +82,22 @@ export default function Message() {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-  
+    
+    //function to send message
     const sendMessage = () => {
       if (newMessage.trim() !== "") {
         console.log("sending message")
+        const sentTime = Math.round(Date.now()/100)
         stompClient.publish({
-          destination: `/chatApp/addChat/${socket}`, // Assuming this is the correct destination
+          destination: `/chatApp/addChat/${socket}`,
           body: JSON.stringify({
             content: newMessage,
-            sender: cookies.get("user-id")
+            sender: cookies.get("user-id"),
+            socketId : socket,
+            timeStamp : sentTime
           })
         });
+        setNewMessage("")
       }
     };
   
@@ -132,21 +134,31 @@ export default function Message() {
             <h2 className="text-2xl font-medium text-left tracking-wide text-nowrap my-1">{user.userName || "Loading..."}</h2>
           </div>
         </div>
-        {/*TO DO */}
-        <div className="w-full h-full bg-lime-300">
+
+        <div className="w-full h-full bg-white">
           {messages.map((message)=>{
+
+            let time = new Date(message.timeStamp);// Milliseconds to time
+            time = time.toTimeString().split(" ")[0].substring(0,5)
+
             return (
-              <div className="w-full h-14 bg-slate-400 shadow-2xl">
-                message
+              <div key={message._id} className={`w-fit flex flex-col my-2 h-auto bg-slate-300 shadow-
+              xl rounded-3xl p-3 text-wrap ${message.sender === cookies.get("user-id") ? "ml-auto mr-2" : "ml-2 mr-auto" }`}>
+                <div className={`text-slate-400 text-xs w-fit ${message.sender === cookies.get("user-id") ? "ml-auto right-0" : "left-0 mr-auto" }`}>
+                  {message.sender === cookies.get("user-id") ? "You" : user.userName}
+                </div>
+                {message.content}
+                <div className={`text-slate-400 text-xs w-fit ${message.sender === cookies.get("user-id") ? "ml-auto right-0" : "left-0 mr-auto" }`}>
+                  {time}
+                </div>
               </div>
             )
           }
           )}
         </div>
 
-
         <div className="w-full h-14 py-2 px-1 flex items-center">
-          <textarea type="text" onChange={(e) => setNewMessage(e.target.value)} className="rounded-2xl bg-slate-300 h-full w-full px-2 pt-1 overflow-hidden text-lg text-wrap resize-none focus:outline-none" placeholder="Enter you message"
+          <textarea type="text" onChange={(e) => setNewMessage(e.target.value)} value={newMessage} className="rounded-2xl bg-slate-300 h-full w-full px-2 pt-1 overflow-hidden text-lg text-wrap resize-none focus:outline-none" placeholder="Enter you message"
           onKeyDown={
             (e) => {
               if(e.key === 'Enter'){

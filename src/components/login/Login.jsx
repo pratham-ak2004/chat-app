@@ -53,6 +53,10 @@ export default function Login(props) {
         })
         .catch((error) => {
             console.log(error);
+            if(cookies.get("user-id") !== undefined)cookies.remove("user-id");
+            if(cookies.get("user-img") !== undefined)cookies.remove("user-img");
+            if(cookies.get("user-name") !== undefined)cookies.remove("user-name");
+            if(cookies.get("user-friends") !== undefined)cookies.remove("user-friends");
             alert("Error Logging in")
         })
     }

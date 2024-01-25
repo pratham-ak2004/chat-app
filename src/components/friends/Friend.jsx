@@ -25,7 +25,7 @@ export default function Friend(props) {
 
   React.useEffect(() => {
     fetchUserDetails(props.Uid);
-  },[]);
+  },[props.Uid]);
 
   return (
     <>
