@@ -40,7 +40,7 @@ export default function FriendList() {
       <div className={`h-auto min-h-screen overflow-y-auto p-2 bg-slate-300 w-full md:basis-1/3 ${location.pathname.startsWith("/chat/")&&(!location.pathname.endsWith("/chat/"))&&isMobile ? "hidden" : ""}`}>
         <div className="gap-3 grid items-start overflow-y-auto pb-20 overflow-x-hidden">
 
-        <div className="bg-slate-100 w-full h-24 rounded-lg shadow-xl flex flex-col items-center justify-center font-extrabold text-2xl text-slate-700" onClick={handleAddFriend}> + Add Friend</div>
+        <div className="bg-slate-100 w-full h-24 rounded-lg shadow-xl flex flex-col items-center justify-center font-bold text-xl text-slate-700" onClick={handleAddFriend}> + Add Friend</div>
         
         {userFriends&&userFriends.map((index) => <Friend key={index} handleChatSelect={handleChatSelect} Uid={index}/>)}
 

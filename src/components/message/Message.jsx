@@ -12,6 +12,7 @@ export default function Message() {
   const [socket , setSocket] = React.useState(undefined);
   const [messages , setMessages] = React.useState([]);
   const [newMessage, setNewMessage] = React.useState("");
+  const messageContainerRef = React.useRef(null);
 
   const stompClient = new Client({
     brokerURL: 'ws://localhost:8080/api/socket'
@@ -26,7 +27,7 @@ export default function Message() {
 
   
   const fetchUserDetails = async (uid) => {
-    63
+  
     const valueToSend = [cookies.get("user-id"),target].sort();
 
     await fetch(`${import.meta.env.VITE_BACKEND_HOST_API_KEY}/api/getUserDetailsWithSocket/${uid}`,{
@@ -51,9 +52,24 @@ export default function Message() {
     });
   }
 
-  const fetchPreviousMessages =  () => {
-    // to do
-    console.log("fetching messages")
+  const fetchPreviousMessages = async() => {
+    await fetch(`${import.meta.env.VITE_BACKEND_HOST_API_KEY}/api/getChatMessages/${socket}`,{
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      })
+      .then((res)=>{
+        if(res.status === 200){
+          const dataPromise = res.json();
+          dataPromise.then((data)=>{
+            setMessages(data)
+          })
+        }
+      })
+    .catch((err)=>{
+      console.log(err)
+    });
   }
 
   const handleConnectionWebSocket = () => {
@@ -117,17 +133,29 @@ export default function Message() {
  },[])
 
  React.useEffect(() => {
+  fetchPreviousMessages();
+},[socket])
+
+ React.useEffect(() => {
   if (socket) {
     handleConnectionWebSocket();
   }
 }, [socket]);
+
+  React.useEffect(() => {
+    // Scroll to the bottom when messages change
+    if (messageContainerRef !== null && messageContainerRef.current) {
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
 
   
   return (
     <>
       <div className="w-full md:basis-2/3 flex flex-col flex-nowrap justify-between content-center" >
 
-        <div className="w-full h-14 bg-slate-400 shadow-2xl">
+        <div className="w-full h-20 bg-slate-400 shadow-2xl md:h-16">
           <div className="h-full w-full flex flex-row items-center">
           <svg className="mx-3 h-full" onClick={handleBackButton} xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
             <img className="w-12 h-12 rounded-full m-1" src={user.userImg || "https://via.placeholder.com/150"} alt="Profile" />
@@ -135,21 +163,19 @@ export default function Message() {
           </div>
         </div>
 
-        <div className="w-full h-full bg-white">
+        <div ref={messageContainerRef} className="w-full h-full bg-white overflow-y-auto overscroll-contain scroll-smooth">
           {messages.map((message)=>{
 
-            let time = new Date(message.timeStamp);// Milliseconds to time
+            let time = new Date(message.timeStamp*100);// Milliseconds to time
             time = time.toTimeString().split(" ")[0].substring(0,5)
 
             return (
-              <div key={message._id} className={`w-fit flex flex-col my-2 h-auto bg-slate-300 shadow-
-              xl rounded-3xl p-3 text-wrap ${message.sender === cookies.get("user-id") ? "ml-auto mr-2" : "ml-2 mr-auto" }`}>
-                <div className={`text-slate-400 text-xs w-fit ${message.sender === cookies.get("user-id") ? "ml-auto right-0" : "left-0 mr-auto" }`}>
-                  {message.sender === cookies.get("user-id") ? "You" : user.userName}
-                </div>
-                {message.content}
-                <div className={`text-slate-400 text-xs w-fit ${message.sender === cookies.get("user-id") ? "ml-auto right-0" : "left-0 mr-auto" }`}>
-                  {time}
+              <div key={message._id} className={`w-full h-auto my-2 flex flex-col`}>
+                <div className={`w-fit rounded-lg p-2 ${message.sender === cookies.get("user-id") ? "ml-auto mr-2 bg-slate-500" : "mr-auto ml-2 bg-slate-300"}`}>
+                  {message.content}
+                  <div className={`text-xs w-fit mt-1 ${message.sender === cookies.get("user-id") ? "ml-auto right-0 text-slate-300" : "left-0 mr-auto text-slate-600" }`}>
+                    {time}
+                  </div>
                 </div>
               </div>
             )
