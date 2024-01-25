@@ -15,7 +15,7 @@ export default function Message() {
   const messageContainerRef = React.useRef(null);
 
   const stompClient = new Client({
-    brokerURL: 'ws://localhost:8080/api/socket'
+    brokerURL: `${import.meta.env.VITE_WEB_SOCKET_HOST_URL}/api/socket`
   });
 
   const handleBackButton = (e) => {
