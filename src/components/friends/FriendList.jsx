@@ -6,15 +6,20 @@ import Friend from "./Friend";
 
 const cookies = new Cookies();
 
-export default function FriendList() {
+export default function FriendList(props) {
 
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
   const [userFriends , setUserFriends] = React.useState();
 
-  const handleChatSelect = (e,target) => {
+  const handleChatSelect = (e,target,userData,socketData) => {
     e.preventDefault();
+
+    props.setTarget({
+      user : userData,
+      socket : socketData
+    });
 
     navigate(`/chat/${target}`);
   }
@@ -42,7 +47,7 @@ export default function FriendList() {
 
         <div className="bg-slate-100 w-full h-24 rounded-lg shadow-xl flex flex-col items-center justify-center font-bold text-xl text-slate-700" onClick={handleAddFriend}> + Add Friend</div>
         
-        {userFriends&&userFriends.map((index) => <Friend key={index} handleChatSelect={handleChatSelect} Uid={index}/>)}
+        {userFriends&&userFriends.map((index) => <Friend key={index} setTarget={props.setTarget} handleChatSelect={handleChatSelect} Uid={index}/>)}
 
         </div>
       </div>

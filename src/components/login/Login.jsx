@@ -15,7 +15,7 @@ export default function Login(props) {
         if(cookies.get("user-name")){
             navigate(props.redirect)
         }
-    },[])
+    },[props.redirect])
 
     const handleSignIn = (e) => {
         e.preventDefault();

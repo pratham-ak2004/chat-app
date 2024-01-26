@@ -5,11 +5,8 @@ import {Client} from "@stomp/stompjs";
 
 const cookies = new Cookies();
 
-export default function Message() {
-  const [target , setTarget] = React.useState(useParams().target);
-  const [user , setUser] = React.useState({});
+export default function Message(props) {
   const navigate = useNavigate();
-  const [socket , setSocket] = React.useState(undefined);
   const [messages , setMessages] = React.useState([]);
   const [newMessage, setNewMessage] = React.useState("");
   const messageContainerRef = React.useRef(null);
@@ -25,35 +22,8 @@ export default function Message() {
     navigate("/chat");
   }
 
-  
-  const fetchUserDetails = async (uid) => {
-  
-    const valueToSend = [cookies.get("user-id"),target].sort();
-
-    await fetch(`${import.meta.env.VITE_BACKEND_HOST_API_KEY}/api/getUserDetailsWithSocket/${uid}`,{
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        "participants" : valueToSend
-      })
-      })
-      .then((res)=>{
-        if(res.status === 200){
-          res.json().then((data)=>{
-            setUser(data.user)
-            setSocket(data.socket._id)
-          })
-        }
-      })
-    .catch((err)=>{
-      console.log(err)
-    });
-  }
-
-  const fetchPreviousMessages = async() => {
-    await fetch(`${import.meta.env.VITE_BACKEND_HOST_API_KEY}/api/getChatMessages/${socket}`,{
+  const fetchPreviousMessages = async(id) => {
+    await fetch(`${import.meta.env.VITE_BACKEND_HOST_API_KEY}/api/getChatMessages/${id}`,{
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -76,9 +46,9 @@ export default function Message() {
 
     stompClient.onConnect = (frame) => {
       console.log('Connected: ' + frame);
-      stompClient.subscribe(`/chat/${socket}`, (response) => {
+
+      stompClient.subscribe(`/chat/${props.target.socket._id}`, (response) => {
         // function which runs on sending message
-          console.log(response);
           const newMessage = JSON.parse(response.body);
           setMessages((prevMessages) => [...prevMessages, newMessage]);
       });
@@ -101,15 +71,17 @@ export default function Message() {
     
     //function to send message
     const sendMessage = () => {
+
       if (newMessage.trim() !== "") {
         console.log("sending message")
         const sentTime = Math.round(Date.now()/100)
+
         stompClient.publish({
-          destination: `/chatApp/addChat/${socket}`,
+          destination: `/chatApp/addChat/${props.target.socket._id}`,
           body: JSON.stringify({
             content: newMessage,
             sender: cookies.get("user-id"),
-            socketId : socket,
+            socketId : props.target.socket._id,
             timeStamp : sentTime
           })
         });
@@ -127,20 +99,16 @@ export default function Message() {
     }
   };
 
-  // UseEffects for initial fetchs
- React.useEffect(() => {
-    fetchUserDetails(target);
- },[])
 
- React.useEffect(() => {
-  fetchPreviousMessages();
-},[socket])
-
- React.useEffect(() => {
-  if (socket) {
-    handleConnectionWebSocket();
-  }
-}, [socket]);
+  React.useEffect(() => {
+    console.log("use Effect")
+    setMessages([])
+    setSocket(props.target.socket._id)
+    if(socket){
+      fetchPreviousMessages(props.target.socket._id);
+      handleConnectionWebSocket();
+    }
+  },[props.target.user.userName])
 
   React.useEffect(() => {
     // Scroll to the bottom when messages change
@@ -158,8 +126,8 @@ export default function Message() {
         <div className="w-full h-20 bg-slate-400 shadow-2xl md:h-16">
           <div className="h-full w-full flex flex-row items-center">
           <svg className="mx-3 h-full" onClick={handleBackButton} xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
-            <img className="w-12 h-12 rounded-full m-1" src={user.userImg || "https://via.placeholder.com/150"} alt="Profile" />
-            <h2 className="text-2xl font-medium text-left tracking-wide text-nowrap my-1">{user.userName || "Loading..."}</h2>
+            <img className="w-12 h-12 rounded-full m-1" src={props.target.user.userImg || "https://via.placeholder.com/150"} alt="Profile" />
+            <h2 className="text-2xl font-medium text-left tracking-wide text-nowrap my-1">{props.target.user.userName || "Loading..."}</h2>
           </div>
         </div>
 

@@ -13,6 +13,10 @@ import { useMediaQuery } from "react-responsive";
 function MainContent() {
   const location = useLocation();
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
+  const [target, setTarget] = React.useState({
+    user : "",
+    socket : ""
+  });
 
   return (
     <>
@@ -20,8 +24,8 @@ function MainContent() {
         <div className={`pt-20 w-full h-full ${location.pathname.startsWith("/chat/") && isMobile ? "pt-0" : ""} ${location.pathname === '/' || location.pathname === '/invite' || location.pathname === '/addFriend' ? '' : 'flex flex-grow'}`}>
           <Routes>
             <Route exact path="/" element={<Login redirect={"/chat"} />}></Route>
-            <Route exact path="/chat" element={<><FriendList /><MessageBoilerPlate /></>}></Route>
-            <Route exact path="/chat/:target" element={<><FriendList /><Message /></>}></Route>
+            <Route exact path="/chat" element={<><FriendList setTarget={setTarget}/><MessageBoilerPlate /></>}></Route>
+            <Route exact path="/chat/:target" element={<><FriendList setTarget={setTarget}/><Message target={target}/></>}></Route>
             <Route exact path="/invite" element={<Login redirect={"/addFriend"}/>}></Route>
             <Route exact path="/addFriend" element={<AddFriend/>}></Route>
           </Routes>
