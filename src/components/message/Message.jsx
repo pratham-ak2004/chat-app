@@ -103,8 +103,7 @@ export default function Message(props) {
   React.useEffect(() => {
     console.log("use Effect")
     setMessages([])
-    setSocket(props.target.socket._id)
-    if(socket){
+    if(props.target.socket._id){
       fetchPreviousMessages(props.target.socket._id);
       handleConnectionWebSocket();
     }

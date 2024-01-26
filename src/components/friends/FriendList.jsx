@@ -11,7 +11,7 @@ export default function FriendList(props) {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
-  const [userFriends , setUserFriends] = React.useState();
+  const [userFriends , setUserFriends] = React.useState(cookies.get("user-friends"));
 
   const handleChatSelect = (e,target,userData,socketData) => {
     e.preventDefault();

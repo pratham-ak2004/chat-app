@@ -21,7 +21,7 @@ function MainContent() {
   return (
     <>
         <NavBar />
-        <div className={`pt-20 w-full h-full ${location.pathname.startsWith("/chat/") && isMobile ? "pt-0" : ""} ${location.pathname === '/' || location.pathname === '/invite' || location.pathname === '/addFriend' ? '' : 'flex flex-grow'}`}>
+        <div className={`pt-0 md:pt-20 w-full h-full ${location.pathname.startsWith("/chat/") && isMobile ? "pt-0" : ""} ${location.pathname === '/' || location.pathname === '/invite' || location.pathname === '/addFriend' ? '' : 'flex flex-grow'}`}>
           <Routes>
             <Route exact path="/" element={<Login redirect={"/chat"} />}></Route>
             <Route exact path="/chat" element={<><FriendList setTarget={setTarget}/><MessageBoilerPlate /></>}></Route>
