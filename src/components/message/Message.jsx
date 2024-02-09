@@ -73,7 +73,6 @@ export default function Message(props) {
     const sendMessage = () => {
 
       if (newMessage.trim() !== "") {
-        console.log("sending message")
         const sentTime = Math.round(Date.now()/100)
 
         stompClient.publish({
