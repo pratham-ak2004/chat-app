@@ -100,8 +100,10 @@ export default function Message(props) {
 
 
   React.useEffect(() => {
-    console.log("use Effect")
     setMessages([])
+    if(props.target.socket._id == ""){
+      navigate("/chat");
+    }
     if(props.target.socket._id){
       fetchPreviousMessages(props.target.socket._id);
       handleConnectionWebSocket();
