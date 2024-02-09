@@ -101,12 +101,11 @@ export default function Message(props) {
 
   React.useEffect(() => {
     setMessages([])
-    if(props.target.socket._id == ""){
-      navigate("/chat");
-    }
     if(props.target.socket._id){
       fetchPreviousMessages(props.target.socket._id);
       handleConnectionWebSocket();
+    }else{
+      navigate("/chat");
     }
   },[props.target.user.userName])
 
